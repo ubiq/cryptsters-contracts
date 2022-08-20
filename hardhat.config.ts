@@ -61,6 +61,12 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0,
       "mainnet": '0xc5070A5CB93F4497240a57969485C0FbF5c2ee3A',
+    },
+    beneficiary: {
+      default: 0,
+    },
+    royalties: {
+      default: 0,
     }
   },
   abiExporter: {
