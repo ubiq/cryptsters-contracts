@@ -13,25 +13,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-function getMnemonic(networkName?: string): string {
-  if (networkName) {
-    const mnemonic = process.env['MNEMONIC_' + networkName.toUpperCase()];
-    if (mnemonic && mnemonic !== '') {
-      return mnemonic;
-    }
-  }
-
-  const mnemonic = process.env.MNEMONIC;
-  if (!mnemonic || mnemonic === '') {
-    return 'test test test test test test test test test test test junk';
-  }
-  return mnemonic;
-}
-
-function accounts(networkName?: string): {mnemonic: string} {
-  return {mnemonic: getMnemonic(networkName)};
-}
-
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
@@ -48,8 +29,13 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
+    hardhat: {
+      accounts: {mnemonic: 'test test test test test test test test test test test junk',
+                 accountsBalance: "100000000000000000000000"},
+    },
     localhost: {
-      accounts: accounts(),
+      accounts: {mnemonic: 'test test test test test test test test test test test junk',
+                 accountsBalance: "100000000000000000000000"},
     },
     mainnet: {
       url: "http://127.0.0.1:8588",
