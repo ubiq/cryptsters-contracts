@@ -83,4 +83,26 @@ describe("Cryptsters", function () {
     await expect(crypstersContract.mint(1, { value: mintPrice }))
       .to.be.revertedWith("Purchase would exceed max supply of tokens");    
   });
+
+  it("Should support the ERC721 and ERC2198 standards", async () => {
+    const ERC721InterfaceId = "0x80ac58cd";
+    const ERC2981InterfaceId = "0x2a55205a";
+
+    expect(await crypstersContract.supportsInterface(ERC721InterfaceId))
+      .to.be.equal(true);
+    expect(await crypstersContract.supportsInterface(ERC2981InterfaceId))
+      .to.be.equal(true);
+  });
+
+  it("Should return the correct royalty info", async () => {
+    Promise.all(
+      [
+        crypstersContract.setActive(true),
+        crypstersContract.mint(1, { value: mintPrice }),
+      ])
+    // 5% of 1000 = 50
+    let royaltyInfo = await crypstersContract.royaltyInfo(1, 1000)
+    expect (royaltyInfo.royaltyAmount.toNumber())
+      .to.be.equal(50);
+  });
 });

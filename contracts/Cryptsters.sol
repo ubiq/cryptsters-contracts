@@ -71,7 +71,7 @@ contract Cryptsters is ERC721, IERC2981, Ownable, ReentrancyGuard {
         require(_currentId + quantity <= MAX_SUPPLY, "Purchase would exceed max supply of tokens");
         require(MINT_PRICE * quantity <= msg.value, "UBQ value sent is not correct");
 
-        for(uint i = 1; i <= quantity; i++) {
+        for (uint i = 1; i <= quantity; i++) {
             _currentId++;
             _safeMint(msg.sender, _currentId);
         }
