@@ -45,13 +45,15 @@ const config: HardhatUserConfig = {
   namedAccounts: {
     deployer: {
       default: 0,
-      "mainnet": '0xc5070A5CB93F4497240a57969485C0FbF5c2ee3A',
+      "mainnet": '0xf3cCA8B945F2AADdb163A3B37bc92424E4Ca1789',
     },
     beneficiary: {
-      default: 0,
+      default: 1,
+      "mainnet": '0xf3cCA8B945F2AADdb163A3B37bc92424E4Ca1789',
     },
     royalties: {
-      default: 0,
+      default: 2,
+      "mainnet": '0xf3cCA8B945F2AADdb163A3B37bc92424E4Ca1789',
     }
   },
   abiExporter: {

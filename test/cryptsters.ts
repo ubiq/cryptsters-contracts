@@ -7,13 +7,15 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 describe("Cryptsters", function () {
   let crypstersContract: Contract;
   let owner: SignerWithAddress;
+  let beneficiary: SignerWithAddress;
+  let royalties: SignerWithAddress;
   const mintPrice = 100000000000000000000n; // 100 UBQ
 
   beforeEach(async () => {
-    [owner] = await ethers.getSigners();
+    [owner, beneficiary, royalties] = await ethers.getSigners();
 
     const Cryptsters = await ethers.getContractFactory("Cryptsters");
-    crypstersContract = await Cryptsters.deploy(owner.address, owner.address, "https://crypstersapi.ubiqsmart.com/cryptster/")
+    crypstersContract = await Cryptsters.deploy(beneficiary.address, royalties.address, "https://crypstersapi.ubiqsmart.com/cryptster/")
   });
 
   it("Should fail to mint when sale is inactive", async () => {
@@ -61,6 +63,26 @@ describe("Cryptsters", function () {
         crypstersContract.mint(10, { value: 1000000000000000000000n })
       ])
     expect(await crypstersContract.totalSupply()).to.be.equal(10);
+  });
+
+  it("Should Withdraw to beneficiary", async () => {
+    let balance = await ethers.provider.getBalance(beneficiary.address);
+    expect(ethers.utils.formatEther(await balance.toString())).to.equal(
+      '100000.0'
+    );
+    Promise.all(
+      [
+        crypstersContract.setActive(true),
+        crypstersContract.mint(1, { value: mintPrice })
+      ]);
+    
+    const setWithdrawTx = await crypstersContract.withdraw();
+    await setWithdrawTx.wait();
+    
+    balance = await ethers.provider.getBalance(beneficiary.address);
+    expect(ethers.utils.formatEther(await balance.toString())).to.equal(
+      '100100.0'
+    );
   });
 
   it("Should fail to mint when exceeded max token purchase", async () => {
