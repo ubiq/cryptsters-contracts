@@ -10,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('Cryptsters', {
     from: deployer,
-    args: [beneficiary, royalties, "https://crypstersapi.ubiqsmart.com/cryptster/"],
+    args: [beneficiary, royalties, "https://cryptstersapi.ubiqsmart.com/cryptster/"],
     log: true,
   });
 };
