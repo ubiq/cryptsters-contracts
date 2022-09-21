@@ -5,7 +5,7 @@ import { Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("Cryptsters", function () {
-  let crypstersContract: Contract;
+  let cryptstersContract: Contract;
   let owner: SignerWithAddress;
   let beneficiary: SignerWithAddress;
   let royalties: SignerWithAddress;
@@ -15,54 +15,54 @@ describe("Cryptsters", function () {
     [owner, beneficiary, royalties] = await ethers.getSigners();
 
     const Cryptsters = await ethers.getContractFactory("Cryptsters");
-    crypstersContract = await Cryptsters.deploy(beneficiary.address, royalties.address, "https://crypstersapi.ubiqsmart.com/cryptster/")
+    cryptstersContract = await Cryptsters.deploy(beneficiary.address, royalties.address, "https://cryptstersapi.ubiqsmart.com/cryptster/")
   });
 
   it("Should fail to mint when sale is inactive", async () => {
-    await expect(crypstersContract.mint(1, { value: mintPrice }))
+    await expect(cryptstersContract.mint(1, { value: mintPrice }))
       .to.be.revertedWith("Sale must be active to mint Tokens");
   });
 
   it("Should mint with Token ID 1", async () => {
-    await crypstersContract.setActive(true);
-    await expect(crypstersContract.mint(1, { value: mintPrice }))
-      .to.emit(crypstersContract, "Transfer")
+    await cryptstersContract.setActive(true);
+    await expect(cryptstersContract.mint(1, { value: mintPrice }))
+      .to.emit(cryptstersContract, "Transfer")
       .withArgs(ethers.constants.AddressZero, owner.address, 1);
   });
 
   it("Should fail to mint when incorrect value sent", async () => {
-    await crypstersContract.setActive(true);
-    await expect(crypstersContract.mint(1, { value: 10 }))
+    await cryptstersContract.setActive(true);
+    await expect(cryptstersContract.mint(1, { value: 10 }))
       .to.be.revertedWith("UBQ value sent is not correct");
   });
 
   it("Should get tokenURI", async () => {
     Promise.all(
       [
-        crypstersContract.setActive(true),
-        crypstersContract.mint(1, { value: mintPrice }),
+        cryptstersContract.setActive(true),
+        cryptstersContract.mint(1, { value: mintPrice }),
       ])
-    expect(await crypstersContract.tokenURI(1))
-      .to.be.equal("https://crypstersapi.ubiqsmart.com/cryptster/1");
+    expect(await cryptstersContract.tokenURI(1))
+      .to.be.equal("https://cryptstersapi.ubiqsmart.com/cryptster/1");
   });
 
   it("Should increment total supply - Single mint", async () => {
     Promise.all(
       [
-        crypstersContract.setActive(true),
-        crypstersContract.mint(1, { value: mintPrice }),
-        crypstersContract.mint(1, { value: mintPrice }),
+        cryptstersContract.setActive(true),
+        cryptstersContract.mint(1, { value: mintPrice }),
+        cryptstersContract.mint(1, { value: mintPrice }),
       ])
-    expect(await crypstersContract.totalSupply()).to.be.equal(2);
+    expect(await cryptstersContract.totalSupply()).to.be.equal(2);
   });
 
   it("Should increment total supply - Multiple mint", async () => {
     Promise.all(
       [
-        crypstersContract.setActive(true),
-        crypstersContract.mint(10, { value: 1000000000000000000000n })
+        cryptstersContract.setActive(true),
+        cryptstersContract.mint(10, { value: 1000000000000000000000n })
       ])
-    expect(await crypstersContract.totalSupply()).to.be.equal(10);
+    expect(await cryptstersContract.totalSupply()).to.be.equal(10);
   });
 
   it("Should Withdraw to beneficiary", async () => {
@@ -72,11 +72,11 @@ describe("Cryptsters", function () {
     );
     Promise.all(
       [
-        crypstersContract.setActive(true),
-        crypstersContract.mint(1, { value: mintPrice })
+        cryptstersContract.setActive(true),
+        cryptstersContract.mint(1, { value: mintPrice })
       ]);
     
-    const setWithdrawTx = await crypstersContract.withdraw();
+    const setWithdrawTx = await cryptstersContract.withdraw();
     await setWithdrawTx.wait();
     
     balance = await ethers.provider.getBalance(beneficiary.address);
@@ -86,23 +86,23 @@ describe("Cryptsters", function () {
   });
 
   it("Should fail to mint when exceeded max token purchase", async () => {
-    await crypstersContract.setActive(true);
-    await expect(crypstersContract.mint(11, { value: 1100000000000000000000n }))
+    await cryptstersContract.setActive(true);
+    await expect(cryptstersContract.mint(11, { value: 1100000000000000000000n }))
       .to.be.revertedWith("Exceeded max token purchase");
   });
 
   it("Should fail to mint when exceeded supply", async () => {
-    await crypstersContract.setActive(true);
+    await cryptstersContract.setActive(true);
     // Mint 880
     for (let i = 0; i < 88; i++) {
-      await expect(crypstersContract.mint(10, { value: 1000000000000000000000n }))
+      await expect(cryptstersContract.mint(10, { value: 1000000000000000000000n }))
     }
 
     // Mint 8
-    await crypstersContract.mint(8, { value: 800000000000000000000n })
-    expect(await crypstersContract.totalSupply()).to.be.equal(888);
+    await cryptstersContract.mint(8, { value: 800000000000000000000n })
+    expect(await cryptstersContract.totalSupply()).to.be.equal(888);
 
-    await expect(crypstersContract.mint(1, { value: mintPrice }))
+    await expect(cryptstersContract.mint(1, { value: mintPrice }))
       .to.be.revertedWith("Purchase would exceed max supply of tokens");    
   });
 
@@ -110,20 +110,20 @@ describe("Cryptsters", function () {
     const ERC721InterfaceId = "0x80ac58cd";
     const ERC2981InterfaceId = "0x2a55205a";
 
-    expect(await crypstersContract.supportsInterface(ERC721InterfaceId))
+    expect(await cryptstersContract.supportsInterface(ERC721InterfaceId))
       .to.be.equal(true);
-    expect(await crypstersContract.supportsInterface(ERC2981InterfaceId))
+    expect(await cryptstersContract.supportsInterface(ERC2981InterfaceId))
       .to.be.equal(true);
   });
 
   it("Should return the correct royalty info", async () => {
     Promise.all(
       [
-        crypstersContract.setActive(true),
-        crypstersContract.mint(1, { value: mintPrice }),
+        cryptstersContract.setActive(true),
+        cryptstersContract.mint(1, { value: mintPrice }),
       ])
     // 5% of 1000 = 50
-    let royaltyInfo = await crypstersContract.royaltyInfo(1, 1000)
+    let royaltyInfo = await cryptstersContract.royaltyInfo(1, 1000)
     expect (royaltyInfo.royaltyAmount.toNumber())
       .to.be.equal(50);
   });
